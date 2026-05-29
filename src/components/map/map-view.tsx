@@ -4,8 +4,8 @@ import dynamic from "next/dynamic";
 
 const WorldGlobe = dynamic(
   async () => {
-    const module = await import("@/components/map/world-globe");
-    return module.WorldGlobe;
+    const worldGlobeModule = await import("@/components/map/world-globe");
+    return worldGlobeModule.WorldGlobe;
   },
   {
     ssr: false,

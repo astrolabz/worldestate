@@ -90,7 +90,7 @@ export async function getListingsByBoundingBox(
 
   const result = await getDb().execute(query);
 
-  return result.rows.map((row) => mapRowToListing(row));
+  return result.map((row) => mapRowToListing(row as unknown as ListingQueryRow));
 }
 
 export async function upsertPropertyListing(listing: UpsertListingInput): Promise<void> {

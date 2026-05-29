@@ -23,7 +23,7 @@ WorldEstate è una webapp Next.js che aggrega annunci immobiliari globali su un 
 Crea un file `.env.local` nella root del progetto:
 
 ```bash
-DATABASE_URL=******HOST:5432/worldestate
+DATABASE_URL=YOUR_DATABASE_URL
 CRON_SECRET=una-chiave-segreta-lunga
 INGESTION_SOURCE_URL=https://esempio-portale.com/listings
 NEXT_PUBLIC_CESIUM_ION_TOKEN=il-tuo-token-cesium-ion
@@ -62,7 +62,7 @@ npm run dev
 - `GET /api/listings?bbox=west,south,east,north&minPrice=...&maxPrice=...`
   - Restituisce gli annunci nel Bounding Box visibile.
 - `POST /api/cron/ingest`
-  - Richiede header `Authorization: ****** oppure `x-cron-secret: <CRON_SECRET>`.
+  - Richiede header `x-cron-secret: <CRON_SECRET>` oppure `Authorization` con bearer token equivalente.
   - Esegue il runner di ingestione e salva/aggiorna gli annunci.
 - `GET /api/geocode?query=...`
   - Risolve una ricerca testuale in coordinate geografiche.
@@ -85,7 +85,7 @@ Configura una chiamata giornaliera all'endpoint:
 
 - URL: `https://<tuo-dominio>/api/cron/ingest`
 - Metodo: `POST`
-- Header: `Authorization: ******
+- Header consigliato: `x-cron-secret: <CRON_SECRET>`
 
 ## Note operative
 

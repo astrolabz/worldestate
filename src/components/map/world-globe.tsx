@@ -119,8 +119,8 @@ export function WorldGlobe() {
   }, [activeFilters, computeBoundingBox, fetchListings]);
 
   useEffect(() => {
-    void fetchListings(INITIAL_BBOX, activeFilters);
-  }, [activeFilters, fetchListings]);
+    scheduleFetch();
+  }, [scheduleFetch]);
 
   useEffect(() => {
     const viewer = viewerRef.current?.cesiumElement;
@@ -146,10 +146,13 @@ export function WorldGlobe() {
   }, [listingsById, scheduleFetch]);
 
   async function handleApplyFilters(payload: SearchPayload): Promise<void> {
-    setActiveFilters({
+    const nextFilters = {
       minPrice: payload.minPrice,
       maxPrice: payload.maxPrice,
-    });
+    };
+
+    setActiveFilters(nextFilters);
+    await fetchListings(computeBoundingBox(), nextFilters);
 
     if (!payload.searchText.trim()) {
       return;
