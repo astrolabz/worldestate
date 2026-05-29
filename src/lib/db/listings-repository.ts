@@ -61,6 +61,7 @@ export async function getListingsByBoundingBox(
 ): Promise<PropertyListing[]> {
   const minimumPrice = filters.minPrice ?? null;
   const maximumPrice = filters.maxPrice ?? null;
+  const crossesAntimeridian = bbox.west > bbox.east;
 
   const query = sql<ListingQueryRow>`
     SELECT
@@ -78,9 +79,21 @@ export async function getListingsByBoundingBox(
       created_at AS "createdAt",
       updated_at AS "updatedAt"
     FROM property_listings
-    WHERE ST_Within(
-      point,
-      ST_MakeEnvelope(${bbox.west}, ${bbox.south}, ${bbox.east}, ${bbox.north}, 4326)
+    WHERE (
+      (
+        ${crossesAntimeridian} = FALSE
+        AND ST_Within(
+          point,
+          ST_MakeEnvelope(${bbox.west}, ${bbox.south}, ${bbox.east}, ${bbox.north}, 4326)
+        )
+      )
+      OR (
+        ${crossesAntimeridian} = TRUE
+        AND (
+          ST_Within(point, ST_MakeEnvelope(${bbox.west}, ${bbox.south}, 180, ${bbox.north}, 4326))
+          OR ST_Within(point, ST_MakeEnvelope(-180, ${bbox.south}, ${bbox.east}, ${bbox.north}, 4326))
+        )
+      )
     )
     AND (${minimumPrice}::numeric IS NULL OR price >= ${minimumPrice})
     AND (${maximumPrice}::numeric IS NULL OR price <= ${maximumPrice})

@@ -47,6 +47,7 @@ export function WorldGlobe() {
   const [selectedListing, setSelectedListing] = useState<PropertyListing | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeFilters, setActiveFilters] = useState<ActiveFilters>({});
+  const [listingsError, setListingsError] = useState<string | null>(null);
 
   useEffect(() => {
     (window as typeof window & { CESIUM_BASE_URL?: string }).CESIUM_BASE_URL = "/cesium";
@@ -62,26 +63,34 @@ export function WorldGlobe() {
 
   const fetchListings = useCallback(
     async (bbox: BoundingBox, filters: ActiveFilters): Promise<void> => {
-      const query = new URLSearchParams({
-        bbox: `${bbox.west},${bbox.south},${bbox.east},${bbox.north}`,
-      });
+      try {
+        const query = new URLSearchParams({
+          bbox: `${bbox.west},${bbox.south},${bbox.east},${bbox.north}`,
+        });
 
-      if (typeof filters.minPrice === "number") {
-        query.set("minPrice", String(filters.minPrice));
-      }
+        if (typeof filters.minPrice === "number") {
+          query.set("minPrice", String(filters.minPrice));
+        }
 
-      if (typeof filters.maxPrice === "number") {
-        query.set("maxPrice", String(filters.maxPrice));
-      }
+        if (typeof filters.maxPrice === "number") {
+          query.set("maxPrice", String(filters.maxPrice));
+        }
 
-      const response = await fetch(`/api/listings?${query.toString()}`);
+        const response = await fetch(`/api/listings?${query.toString()}`);
 
-      if (!response.ok) {
+        if (!response.ok) {
+          setListingsError("Impossibile caricare gli annunci. Riprova tra qualche secondo.");
+          setListings([]);
+          return;
+        }
+
+        const payload = (await response.json()) as { listings: PropertyListing[] };
+        setListingsError(null);
+        setListings(payload.listings);
+      } catch {
+        setListingsError("Errore di rete nel caricamento annunci.");
         return;
       }
-
-      const payload = (await response.json()) as { listings: PropertyListing[] };
-      setListings(payload.listings);
     },
     [],
   );
@@ -209,6 +218,11 @@ export function WorldGlobe() {
           />
         ))}
       </Viewer>
+      {listingsError ? (
+        <div className="pointer-events-none absolute bottom-4 left-1/2 z-30 -translate-x-1/2 rounded-md border border-red-300/40 bg-red-950/75 px-4 py-2 text-sm text-red-100 backdrop-blur-md">
+          {listingsError}
+        </div>
+      ) : null}
       <ListingSidebar listing={selectedListing} open={isSidebarOpen} onOpenChange={setIsSidebarOpen} />
     </div>
   );
