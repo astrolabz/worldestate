@@ -1,0 +1,42 @@
+{
+  "name": "worldestate",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "postinstall": "rm -rf public/cesium && mkdir -p public/cesium && cp -R node_modules/cesium/Build/Cesium/Assets public/cesium && cp -R node_modules/cesium/Build/Cesium/Workers public/cesium && cp -R node_modules/cesium/Build/Cesium/Widgets public/cesium && cp -R node_modules/cesium/Build/Cesium/ThirdParty public/cesium",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "psql \"$DATABASE_URL\" -f drizzle/0000_init.sql"
+  },
+  "dependencies": {
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-slot": "^1.2.4",
+    "cesium": "^1.141.0",
+    "cheerio": "^1.2.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "drizzle-orm": "^0.45.2",
+    "lucide-react": "^1.17.0",
+    "next": "16.2.6",
+    "postgres": "^3.4.9",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "resium": "^1.21.1",
+    "tailwind-merge": "^3.6.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "drizzle-kit": "^0.31.10",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.6",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
